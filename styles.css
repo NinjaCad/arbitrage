@@ -111,8 +111,12 @@ h1 {
   padding: 18px;
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr;
   align-items: end;
+}
+
+.controls-actions {
+  justify-content: flex-end;
 }
 
 .field {
