@@ -1,11 +1,15 @@
 # arbitrage
 
-A simple paywalled arbitrage viewing website inspired by prediction market arbitrage dashboards.
+A static cross-platform prediction market scanner inspired by PredictionHunt arbitrage UI.
 
 ## Run locally
 
 Open `/home/runner/work/arbitrage/arbitrage/index.html` in a browser.
 
-## Demo paywall access
+## Live data setup
 
-Use access code: `ARBITRAGE-PRO`
+1. Enter your PredictionHunt API key in the API Key field.
+2. Keep or edit the default topics list (comma-separated).
+3. Click **Scan Markets** to pull live cross-platform market data from `https://www.predictionhunt.com/api/v2/search`.
+
+For security, the key is used in-memory and is not persisted to localStorage.

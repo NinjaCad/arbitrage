@@ -3,53 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arbitrage Pro Viewer</title>
+  <title>Cross-Platform Price Scanner</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h1>Arbitrage Pro</h1>
-    <p>Real-time style prediction market arbitrage board</p>
-  </header>
-
-  <main class="container">
-    <section id="paywall" class="card paywall">
-      <h2>Members Only</h2>
-      <p>Arbitrage opportunities are available to paid subscribers only.</p>
-      <ul>
-        <li>Cross-market implied probability spreads</li>
-        <li>Estimated ROI and edge</li>
-        <li>Fast refresh dashboard UI</li>
-      </ul>
-      <button id="unlockButton" class="primary">I already subscribed</button>
-      <p class="hint">Demo access code: <strong>ARBITRAGE-PRO</strong></p>
-      <div id="unlockPanel" class="unlock-panel hidden">
-        <label for="accessCode">Enter access code</label>
-        <input id="accessCode" type="password" placeholder="Access code" autocomplete="off" />
-        <button id="submitCode" class="primary">Unlock Dashboard</button>
-        <p id="unlockError" class="error hidden">Invalid code. Please try again.</p>
+  <div class="page-shell">
+    <header class="hero card">
+      <div class="hero-copy">
+        <p class="eyebrow">Prediction Hunt Style Scanner</p>
+        <h1>Cross-Platform Arbitrage</h1>
+        <p class="subtitle">Compare live pricing for the same event across prediction market platforms.</p>
       </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span>Total Groups</span>
+          <strong id="groupCount">0</strong>
+        </div>
+        <div class="stat">
+          <span>Platforms Seen</span>
+          <strong id="platformCount">0</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="controls card">
+      <div class="field api-key-field">
+        <label for="apiKey">API Key</label>
+        <input id="apiKey" type="password" placeholder="Enter PredictionHunt API key" autocomplete="off" />
+      </div>
+      <div class="field topics-field">
+        <label for="topics">Topics (comma separated)</label>
+        <input id="topics" type="text" value="presidential election, fed interest rate, bitcoin" />
+      </div>
+      <div class="actions">
+        <button id="scanButton" class="btn btn-primary">Scan Markets</button>
+        <button id="refreshButton" class="btn btn-secondary">Refresh</button>
+      </div>
+      <p id="status" class="status">Ready to scan.</p>
     </section>
 
-    <section id="dashboard" class="card hidden">
-      <div class="dashboard-header">
-        <h2>Live Arbitrage Opportunities</h2>
-        <button id="lockButton" class="secondary">Lock</button>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Market</th>
-            <th>Best Side A</th>
-            <th>Best Side B</th>
-            <th>Combined Cost</th>
-            <th>Edge</th>
-          </tr>
-        </thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </section>
-  </main>
+    <main id="results" class="results"></main>
+  </div>
 
   <script src="app.js"></script>
 </body>
