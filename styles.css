@@ -203,6 +203,31 @@ input:focus {
   border: 1px solid rgba(53, 215, 154, 0.45);
 }
 
+.roi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.roi-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  padding: 12px;
+}
+
+.roi-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.roi-card h4 {
+  margin: 4px 0 0;
+  color: var(--good);
+  font-size: 1.2rem;
+}
+
 .group-card {
   margin-top: 10px;
   border: 1px solid var(--line);
