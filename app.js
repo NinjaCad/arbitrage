@@ -1,5 +1,4 @@
 const API_BASE = 'https://www.predictionhunt.com/api/v2';
-const API_KEY_STORAGE = 'prediction-hunt-api-key';
 
 const apiKeyInput = document.getElementById('apiKey');
 const topicsInput = document.getElementById('topics');
@@ -131,7 +130,6 @@ const scan = async () => {
     return;
   }
 
-  localStorage.setItem(API_KEY_STORAGE, apiKey);
   setBusy(true);
   setStatus('Loading live market data…');
 
@@ -196,5 +194,4 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-apiKeyInput.value = localStorage.getItem(API_KEY_STORAGE) || '';
 renderEmpty('Set your API key and click "Scan Markets" to load live data.');

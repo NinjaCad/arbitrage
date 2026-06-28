@@ -12,4 +12,4 @@ Open `/home/runner/work/arbitrage/arbitrage/index.html` in a browser.
 2. Keep or edit the default topics list (comma-separated).
 3. Click **Scan Markets** to pull live cross-platform market data from `https://www.predictionhunt.com/api/v2/search`.
 
-The key is stored in browser localStorage for convenience.
+For security, the key is used in-memory and is not persisted to localStorage.
