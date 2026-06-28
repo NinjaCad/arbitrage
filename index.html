@@ -10,36 +10,36 @@
   <div class="page-shell">
     <header class="hero card">
       <div class="hero-copy">
-        <p class="eyebrow">Prediction Hunt Style Scanner</p>
-        <h1>Cross-Platform Arbitrage</h1>
-        <p class="subtitle">Compare live pricing for the same event across prediction market platforms.</p>
+        <p class="eyebrow">PredictionHunt Arbitrage Mirror</p>
+        <h1>Highest ROI Dashboard</h1>
+        <p class="subtitle">Unlock with code and pull the top ROI rates directly from PredictionHunt arbitrage.</p>
       </div>
       <div class="hero-stats">
         <div class="stat">
-          <span>Total Groups</span>
-          <strong id="groupCount">0</strong>
+          <span>Top ROI Entries</span>
+          <strong id="entryCount">0</strong>
         </div>
         <div class="stat">
-          <span>Platforms Seen</span>
-          <strong id="platformCount">0</strong>
+          <span>Best ROI</span>
+          <strong id="bestRoi">-</strong>
         </div>
       </div>
     </header>
 
     <section class="controls card">
-      <div class="field api-key-field">
-        <label for="apiKey">API Key</label>
-        <input id="apiKey" type="password" placeholder="Enter PredictionHunt API key" autocomplete="off" />
+      <div class="field code-field">
+        <label for="accessCode">Access Code</label>
+        <input id="accessCode" type="password" placeholder="Enter dashboard access code" autocomplete="off" />
       </div>
-      <div class="field topics-field">
-        <label for="topics">Topics (comma separated)</label>
-        <input id="topics" type="text" value="presidential election, fed interest rate, bitcoin" />
+      <div class="field source-field">
+        <label>Data Source</label>
+        <input type="text" value="https://www.predictionhunt.com/arbitrage" readonly />
       </div>
       <div class="actions">
-        <button id="scanButton" class="btn btn-primary">Scan Markets</button>
-        <button id="refreshButton" class="btn btn-secondary">Refresh</button>
+        <button id="unlockButton" class="btn btn-primary">Unlock Dashboard</button>
+        <button id="refreshButton" class="btn btn-secondary" disabled>Refresh ROI</button>
       </div>
-      <p id="status" class="status">Ready to scan.</p>
+      <p id="status" class="status">Dashboard is locked.</p>
     </section>
 
     <main id="results" class="results"></main>

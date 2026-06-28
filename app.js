@@ -1,23 +1,20 @@
-const API_BASE = 'https://www.predictionhunt.com/api/v2';
+const ARBITRAGE_URL = 'https://www.predictionhunt.com/arbitrage';
+const ACCESS_CODE = 'arbitrage';
 
-const apiKeyInput = document.getElementById('apiKey');
-const topicsInput = document.getElementById('topics');
-const scanButton = document.getElementById('scanButton');
+const accessCodeInput = document.getElementById('accessCode');
+const unlockButton = document.getElementById('unlockButton');
 const refreshButton = document.getElementById('refreshButton');
 const statusEl = document.getElementById('status');
 const resultsEl = document.getElementById('results');
-const groupCountEl = document.getElementById('groupCount');
-const platformCountEl = document.getElementById('platformCount');
+const entryCountEl = document.getElementById('entryCount');
+const bestRoiEl = document.getElementById('bestRoi');
 
 const asNumber = (value) => {
   const num = Number(value);
   return Number.isFinite(num) ? num : null;
 };
 
-const formatCell = (value) => {
-  const num = asNumber(value);
-  return num === null ? '-' : num.toFixed(3);
-};
+let unlocked = false;
 
 const escapeHtml = (value) => String(value)
   .replaceAll('&', '&amp;')
@@ -26,172 +23,149 @@ const escapeHtml = (value) => String(value)
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#39;');
 
-const parseTopics = () => topicsInput.value
-  .split(',')
-  .map((topic) => topic.trim())
-  .filter(Boolean);
-
 const setStatus = (message, tone = '') => {
   statusEl.textContent = message;
   statusEl.className = `status ${tone}`.trim();
 };
 
 const setBusy = (busy) => {
-  scanButton.disabled = busy;
+  unlockButton.disabled = busy;
   refreshButton.disabled = busy;
-  scanButton.textContent = busy ? 'Scanning…' : 'Scan Markets';
-};
-
-const buildGroupHtml = (eventName, groupTitle, markets) => {
-  const bestBid = Math.max(...markets.map((m) => asNumber(m.yes_bid) ?? -Infinity));
-  const bestAsk = Math.min(...markets.map((m) => asNumber(m.yes_ask) ?? Infinity));
-  const spread = (Number.isFinite(bestBid) && Number.isFinite(bestAsk)) ? bestAsk - bestBid : null;
-
-  const rows = markets
-    .map((market) => {
-      const platform = escapeHtml(market.platform || 'Unknown');
-      const last = formatCell(market.last_price);
-      return `
-        <tr>
-          <td>${platform}</td>
-          <td>${formatCell(market.yes_bid)}</td>
-          <td>${formatCell(market.yes_ask)}</td>
-          <td>${last}</td>
-        </tr>
-      `;
-    })
-    .join('');
-
-  return `
-    <article class="group-card">
-      <div class="group-heading">
-        <p>${escapeHtml(eventName)}</p>
-        <h4>${escapeHtml(groupTitle)}</h4>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Platform</th>
-              <th>Yes Bid</th>
-              <th>Yes Ask</th>
-              <th>Last Price</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-      <div class="group-heading">
-        <p>Bid/Ask Spread</p>
-        <h4 class="${spread !== null && spread <= 0.03 ? 'value-good' : ''}">${spread === null ? '-' : spread.toFixed(3)}</h4>
-      </div>
-    </article>
-  `;
-};
-
-const fetchTopic = async (topic, apiKey) => {
-  const endpoint = new URL(`${API_BASE}/search`);
-  endpoint.searchParams.set('q', topic);
-  endpoint.searchParams.set('limit', '6');
-
-  const response = await fetch(endpoint, {
-    headers: { 'X-API-Key': apiKey }
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status} while loading "${topic}"`);
-  }
-
-  const payload = await response.json();
-  if (payload.error) {
-    throw new Error(payload.error);
-  }
-
-  return payload;
+  unlockButton.textContent = busy ? 'Loading…' : 'Unlock Dashboard';
 };
 
 const renderEmpty = (message) => {
   resultsEl.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
 };
 
-const scan = async () => {
-  const apiKey = apiKeyInput.value.trim();
-  const topics = parseTopics();
+const fetchArbitrageHtml = async () => {
+  const endpoints = [
+    ARBITRAGE_URL,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(ARBITRAGE_URL)}`,
+    'https://r.jina.ai/http://www.predictionhunt.com/arbitrage'
+  ];
 
-  if (!apiKey) {
-    setStatus('Enter your PredictionHunt API key to fetch live prices.', 'error');
-    renderEmpty('Missing API key.');
+  for (const endpoint of endpoints) {
+    try {
+      const response = await fetch(endpoint, { cache: 'no-store' });
+      if (!response.ok) {
+        continue;
+      }
+
+      const html = await response.text();
+      if (html && html.length > 1000) {
+        return html;
+      }
+    } catch {
+      // Try the next endpoint.
+    }
+  }
+
+  throw new Error('Unable to load arbitrage page data right now.');
+};
+
+const extractTopRoiValues = (html) => {
+  const matches = [...html.matchAll(/(-?\d+(?:\.\d+)?)\s*%/g)];
+  const values = matches
+    .map((match) => asNumber(match[1]))
+    .filter((value) => value !== null && value > 0)
+    .sort((a, b) => b - a);
+
+  const deduped = [];
+  values.forEach((value) => {
+    const rounded = Number(value.toFixed(2));
+    if (!deduped.includes(rounded)) {
+      deduped.push(rounded);
+    }
+  });
+
+  return deduped.slice(0, 20);
+};
+
+const renderRates = (rates) => {
+  if (!rates.length) {
+    entryCountEl.textContent = '0';
+    bestRoiEl.textContent = '-';
+    renderEmpty('No ROI percentages found on the source page.');
     return;
   }
 
-  if (!topics.length) {
-    setStatus('Add at least one topic to scan.', 'error');
-    renderEmpty('No topics provided.');
+  entryCountEl.textContent = String(rates.length);
+  bestRoiEl.textContent = `${rates[0].toFixed(2)}%`;
+
+  resultsEl.innerHTML = `
+    <section class="topic-card card">
+      <div class="topic-header">
+        <h3 class="topic-title">Highest ROI Rates</h3>
+        <span class="badge">Source: PredictionHunt</span>
+      </div>
+      <div class="roi-grid">
+        ${rates.map((rate, index) => `
+          <article class="roi-card">
+            <p>#${index + 1}</p>
+            <h4>${rate.toFixed(2)}%</h4>
+          </article>
+        `).join('')}
+      </div>
+    </section>
+  `;
+};
+
+const loadTopRoi = async () => {
+  if (!unlocked) {
+    setStatus('Enter the dashboard code to unlock access.', 'error');
     return;
   }
 
   setBusy(true);
-  setStatus('Loading live market data…');
+  setStatus('Loading ROI values from PredictionHunt arbitrage…');
 
   try {
-    const responses = await Promise.all(topics.map((topic) => fetchTopic(topic, apiKey)));
-
-    const seenPlatforms = new Set();
-    let groupCount = 0;
-
-    const topicCards = responses
-      .map((response, index) => {
-        const topic = topics[index];
-        const groupsHtml = [];
-
-        (response.events || []).forEach((event) => {
-          (event.groups || []).forEach((group) => {
-            const markets = (group.markets || []).filter((market) => market.platform);
-            if (markets.length < 2) {
-              return;
-            }
-
-            markets.forEach((market) => seenPlatforms.add(String(market.platform).toLowerCase()));
-            groupCount += 1;
-            groupsHtml.push(buildGroupHtml(event.event_name || topic, group.title || 'Untitled Group', markets));
-          });
-        });
-
-        const badgeText = groupsHtml.length ? `${groupsHtml.length} market groups` : 'No matches';
-        return `
-          <section class="topic-card card">
-            <div class="topic-header">
-              <h3 class="topic-title">${escapeHtml(topic)}</h3>
-              <span class="badge">${escapeHtml(badgeText)}</span>
-            </div>
-            ${groupsHtml.length ? groupsHtml.join('') : '<div class="empty">No cross-platform markets found for this topic.</div>'}
-          </section>
-        `;
-      })
-      .join('');
-
-    resultsEl.innerHTML = topicCards;
-    groupCountEl.textContent = String(groupCount);
-    platformCountEl.textContent = String(seenPlatforms.size);
-
-    setStatus(`Scan complete: ${groupCount} cross-platform groups found.`, 'success');
+    const html = await fetchArbitrageHtml();
+    const rates = extractTopRoiValues(html);
+    renderRates(rates);
+    setStatus(`Loaded ${rates.length} top ROI values.`, 'success');
   } catch (error) {
-    groupCountEl.textContent = '0';
-    platformCountEl.textContent = '0';
-    renderEmpty(error.message || 'Failed to load data from PredictionHunt API.');
-    setStatus(error.message || 'Failed to load data.', 'error');
+    entryCountEl.textContent = '0';
+    bestRoiEl.textContent = '-';
+    renderEmpty(error.message || 'Failed to load ROI values.');
+    setStatus(error.message || 'Failed to load ROI values.', 'error');
   } finally {
     setBusy(false);
+    refreshButton.disabled = !unlocked;
   }
 };
 
-scanButton.addEventListener('click', scan);
-refreshButton.addEventListener('click', scan);
+const unlockDashboard = () => {
+  const code = accessCodeInput.value.trim();
+  if (!code || code !== ACCESS_CODE) {
+    unlocked = false;
+    refreshButton.disabled = true;
+    entryCountEl.textContent = '0';
+    bestRoiEl.textContent = '-';
+    setStatus('Invalid code. Dashboard remains locked.', 'error');
+    renderEmpty('Access denied. Enter the correct dashboard code.');
+    return;
+  }
+
+  unlocked = true;
+  refreshButton.disabled = false;
+  setStatus('Dashboard unlocked.', 'success');
+  loadTopRoi();
+};
+
+unlockButton.addEventListener('click', unlockDashboard);
+refreshButton.addEventListener('click', loadTopRoi);
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-    scan();
+    if (unlocked) {
+      loadTopRoi();
+      return;
+    }
+
+    unlockDashboard();
   }
 });
 
-renderEmpty('Set your API key and click "Scan Markets" to load live data.');
+renderEmpty('Locked dashboard. Enter access code and click "Unlock Dashboard".');
