@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arbitrage Pro Viewer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Arbitrage Pro</h1>
+    <p>Real-time style prediction market arbitrage board</p>
+  </header>
+
+  <main class="container">
+    <section id="paywall" class="card paywall">
+      <h2>Members Only</h2>
+      <p>Arbitrage opportunities are available to paid subscribers only.</p>
+      <ul>
+        <li>Cross-market implied probability spreads</li>
+        <li>Estimated ROI and edge</li>
+        <li>Fast refresh dashboard UI</li>
+      </ul>
+      <button id="unlockButton" class="primary">I already subscribed</button>
+      <p class="hint">Demo access code: <strong>ARBITRAGE-PRO</strong></p>
+      <div id="unlockPanel" class="unlock-panel hidden">
+        <label for="accessCode">Enter access code</label>
+        <input id="accessCode" type="password" placeholder="Access code" autocomplete="off" />
+        <button id="submitCode" class="primary">Unlock Dashboard</button>
+        <p id="unlockError" class="error hidden">Invalid code. Please try again.</p>
+      </div>
+    </section>
+
+    <section id="dashboard" class="card hidden">
+      <div class="dashboard-header">
+        <h2>Live Arbitrage Opportunities</h2>
+        <button id="lockButton" class="secondary">Lock</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Market</th>
+            <th>Best Side A</th>
+            <th>Best Side B</th>
+            <th>Combined Cost</th>
+            <th>Edge</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
