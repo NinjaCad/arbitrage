@@ -3,46 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cross-Platform Price Scanner</title>
+  <title>Arbitrage Viewer for Prediction Markets | Access</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="page-shell">
-    <header class="hero card">
-      <div class="hero-copy">
-        <p class="eyebrow">PredictionHunt Arbitrage Mirror</p>
-        <h1>Highest ROI Dashboard</h1>
-        <p class="subtitle">Unlock with code and pull the top ROI rates directly from PredictionHunt arbitrage.</p>
-      </div>
-      <div class="hero-stats">
-        <div class="stat">
-          <span>Top ROI Entries</span>
-          <strong id="entryCount">0</strong>
-        </div>
-        <div class="stat">
-          <span>Best ROI</span>
-          <strong id="bestRoi">-</strong>
-        </div>
-      </div>
-    </header>
-
-    <section class="controls card">
-      <div class="field code-field">
+  <div class="page-shell access-shell">
+    <section class="card access-card">
+      <p class="eyebrow">Arbitrage Viewer for Prediction Markets</p>
+      <h1>Enter Access Code</h1>
+      <p class="subtitle">Use your access code to open the dashboard.</p>
+      <div class="field">
         <label for="accessCode">Access Code</label>
         <input id="accessCode" type="password" placeholder="Enter dashboard access code" autocomplete="off" />
       </div>
-      <div class="field source-field">
-        <label>Data Source</label>
-        <input type="text" value="https://www.predictionhunt.com/arbitrage" readonly />
-      </div>
       <div class="actions">
-        <button id="unlockButton" class="btn btn-primary">Unlock Dashboard</button>
-        <button id="refreshButton" class="btn btn-secondary" disabled>Refresh ROI</button>
+        <button id="unlockButton" class="btn btn-primary">Open Dashboard</button>
       </div>
       <p id="status" class="status">Dashboard is locked.</p>
     </section>
-
-    <main id="results" class="results"></main>
   </div>
 
   <script src="app.js"></script>
