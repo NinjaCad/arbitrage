@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arbitrage Viewer for Prediction Markets</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero card">
+      <div class="hero-copy">
+        <p class="eyebrow">Arbitrage Viewer for Prediction Markets</p>
+        <h1>Highest ROI Dashboard</h1>
+        <p class="subtitle">Track top ROI opportunities and compare market-side pricing.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span>Top ROI Entries</span>
+          <strong id="entryCount">0</strong>
+        </div>
+        <div class="stat">
+          <span>Best ROI</span>
+          <strong id="bestRoi">-</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="opportunity card">
+      <div class="topic-header">
+        <h3 class="topic-title">Who will perform at the FIFA World Cup final halftime show?</h3>
+        <span class="badge">+10.2% (177.2% APY)</span>
+      </div>
+      <p class="performer">Rihanna</p>
+      <div class="equation-grid">
+        <article class="eq-card">
+          <p>Cost</p>
+          <h4>Polymarket 3¢ + Kalshi 87¢ = 90¢</h4>
+        </article>
+        <article class="eq-card">
+          <p>Payout</p>
+          <h4>One side always wins. Market payout is always $1.00.</h4>
+        </article>
+        <article class="eq-card">
+          <p>Edge</p>
+          <h4>$1.00 − 90¢ − 1¢ fees = 9¢ risk-free profit after fees</h4>
+        </article>
+      </div>
+      <div class="market-grid">
+        <article class="market-card">
+          <h4>Polymarket</h4>
+          <p class="choice">Buy YES</p>
+          <p>Vol: $60</p>
+          <p>3¢</p>
+          <p>Open market</p>
+        </article>
+        <article class="market-card">
+          <h4>Kalshi</h4>
+          <p class="choice">Buy NO</p>
+          <p>Vol: $2</p>
+          <p>87¢</p>
+          <p>Open market</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="controls card">
+      <div class="field source-field">
+        <label>Data Source</label>
+        <input type="text" value="https://www.predictionhunt.com/arbitrage" readonly />
+      </div>
+      <div class="actions controls-actions">
+        <button id="refreshButton" class="btn btn-secondary">Refresh ROI</button>
+        <button id="lockButton" class="btn btn-primary">Lock Dashboard</button>
+      </div>
+      <p id="status" class="status">Dashboard ready.</p>
+    </section>
+
+    <main id="results" class="results"></main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -37,11 +37,23 @@ body {
   gap: 18px;
 }
 
+.access-shell {
+  min-height: 100vh;
+  place-items: center;
+}
+
 .card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0)), var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
   box-shadow: var(--shadow);
+}
+
+.access-card {
+  width: min(460px, 100%);
+  padding: 24px;
+  display: grid;
+  gap: 12px;
 }
 
 .hero {
@@ -99,7 +111,7 @@ h1 {
   padding: 18px;
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr 1.6fr auto;
+  grid-template-columns: 1fr auto;
   align-items: end;
 }
 
@@ -185,6 +197,7 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  gap: 10px;
 }
 
 .topic-title {
@@ -201,14 +214,25 @@ input:focus {
   background: rgba(53, 215, 154, 0.12);
   color: var(--good);
   border: 1px solid rgba(53, 215, 154, 0.45);
+  white-space: nowrap;
 }
 
+.performer {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.equation-grid,
+.market-grid,
 .roi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 10px;
 }
 
+.eq-card,
+.market-card,
 .roi-card {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -216,75 +240,33 @@ input:focus {
   padding: 12px;
 }
 
+.eq-card p,
+.market-card p,
 .roi-card p {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
 }
 
+.eq-card h4,
+.market-card h4,
 .roi-card h4 {
   margin: 4px 0 0;
-  color: var(--good);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
-.group-card {
-  margin-top: 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.group-heading {
-  padding: 10px 12px;
-  background: #121d36;
-  border-bottom: 1px solid var(--line);
-}
-
-.group-heading p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.group-heading h4 {
-  margin: 2px 0 0;
-  font-size: 0.96rem;
-}
-
-.table-wrap {
-  width: 100%;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 620px;
-}
-
-th,
-td {
-  text-align: left;
-  padding: 9px 12px;
-  border-bottom: 1px solid var(--line);
-}
-
-th {
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.value-good {
-  color: var(--good);
+.choice {
+  color: var(--good) !important;
   font-weight: 700;
+  margin: 6px 0 !important;
+}
+
+.market-card p + p {
+  margin-top: 4px;
+}
+
+.roi-card h4 {
+  color: var(--good);
 }
 
 .empty {

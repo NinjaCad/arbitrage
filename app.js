@@ -1,9 +1,11 @@
 const ARBITRAGE_URL = 'https://www.predictionhunt.com/arbitrage';
 const ACCESS_CODE = 'arbitrage';
+const ACCESS_STORAGE_KEY = 'arbitrage_dashboard_access';
 
 const accessCodeInput = document.getElementById('accessCode');
 const unlockButton = document.getElementById('unlockButton');
 const refreshButton = document.getElementById('refreshButton');
+const lockButton = document.getElementById('lockButton');
 const statusEl = document.getElementById('status');
 const resultsEl = document.getElementById('results');
 const entryCountEl = document.getElementById('entryCount');
@@ -14,8 +16,6 @@ const asNumber = (value) => {
   return Number.isFinite(num) ? num : null;
 };
 
-let unlocked = false;
-
 const escapeHtml = (value) => String(value)
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
@@ -24,19 +24,38 @@ const escapeHtml = (value) => String(value)
   .replaceAll("'", '&#39;');
 
 const setStatus = (message, tone = '') => {
+  if (!statusEl) {
+    return;
+  }
+
   statusEl.textContent = message;
   statusEl.className = `status ${tone}`.trim();
 };
 
 const setBusy = (busy) => {
-  unlockButton.disabled = busy;
-  refreshButton.disabled = busy;
-  unlockButton.textContent = busy ? 'Loading…' : 'Unlock Dashboard';
+  if (unlockButton) {
+    unlockButton.disabled = busy;
+    unlockButton.textContent = busy ? 'Loading…' : 'Open Dashboard';
+  }
+
+  if (refreshButton) {
+    refreshButton.disabled = busy;
+  }
+
+  if (lockButton) {
+    lockButton.disabled = busy;
+  }
 };
 
 const renderEmpty = (message) => {
+  if (!resultsEl) {
+    return;
+  }
+
   resultsEl.innerHTML = `<div class="empty">${escapeHtml(message)}</div>`;
 };
+
+const hasAccess = () => localStorage.getItem(ACCESS_STORAGE_KEY) === 'granted';
 
 const fetchArbitrageHtml = async () => {
   const endpoints = [
@@ -83,6 +102,10 @@ const extractTopRoiValues = (html) => {
 };
 
 const renderRates = (rates) => {
+  if (!resultsEl || !entryCountEl || !bestRoiEl) {
+    return;
+  }
+
   if (!rates.length) {
     entryCountEl.textContent = '0';
     bestRoiEl.textContent = '-';
@@ -112,8 +135,8 @@ const renderRates = (rates) => {
 };
 
 const loadTopRoi = async () => {
-  if (!unlocked) {
-    setStatus('Enter the dashboard code to unlock access.', 'error');
+  if (!hasAccess()) {
+    window.location.href = 'index.html';
     return;
   }
 
@@ -126,46 +149,81 @@ const loadTopRoi = async () => {
     renderRates(rates);
     setStatus(`Loaded ${rates.length} top ROI values.`, 'success');
   } catch (error) {
-    entryCountEl.textContent = '0';
-    bestRoiEl.textContent = '-';
+    if (entryCountEl) {
+      entryCountEl.textContent = '0';
+    }
+
+    if (bestRoiEl) {
+      bestRoiEl.textContent = '-';
+    }
+
     renderEmpty(error.message || 'Failed to load ROI values.');
     setStatus(error.message || 'Failed to load ROI values.', 'error');
   } finally {
     setBusy(false);
-    refreshButton.disabled = !unlocked;
   }
 };
 
 const unlockDashboard = () => {
-  const code = accessCodeInput.value.trim();
+  const code = accessCodeInput ? accessCodeInput.value.trim() : '';
   if (!code || code !== ACCESS_CODE) {
-    unlocked = false;
-    refreshButton.disabled = true;
-    entryCountEl.textContent = '0';
-    bestRoiEl.textContent = '-';
     setStatus('Invalid code. Dashboard remains locked.', 'error');
-    renderEmpty('Access denied. Enter the correct dashboard code.');
     return;
   }
 
-  unlocked = true;
-  refreshButton.disabled = false;
-  setStatus('Dashboard unlocked.', 'success');
+  localStorage.setItem(ACCESS_STORAGE_KEY, 'granted');
+  setStatus('Access granted. Opening dashboard…', 'success');
+  window.location.href = 'dashboard.html';
+};
+
+const lockDashboard = () => {
+  localStorage.removeItem(ACCESS_STORAGE_KEY);
+  window.location.href = 'index.html';
+};
+
+const initAccessPage = () => {
+  if (!accessCodeInput || !unlockButton) {
+    return;
+  }
+
+  if (hasAccess()) {
+    window.location.href = 'dashboard.html';
+    return;
+  }
+
+  unlockButton.addEventListener('click', unlockDashboard);
+
+  accessCodeInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      unlockDashboard();
+    }
+  });
+};
+
+const initDashboardPage = () => {
+  if (!refreshButton || !resultsEl) {
+    return;
+  }
+
+  if (!hasAccess()) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  refreshButton.addEventListener('click', loadTopRoi);
+
+  if (lockButton) {
+    lockButton.addEventListener('click', lockDashboard);
+  }
+
+  renderEmpty('Loading ROI values…');
   loadTopRoi();
 };
 
-unlockButton.addEventListener('click', unlockDashboard);
-refreshButton.addEventListener('click', loadTopRoi);
+if (accessCodeInput) {
+  initAccessPage();
+}
 
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-    if (unlocked) {
-      loadTopRoi();
-      return;
-    }
-
-    unlockDashboard();
-  }
-});
-
-renderEmpty('Locked dashboard. Enter access code and click "Unlock Dashboard".');
+if (refreshButton && resultsEl) {
+  initDashboardPage();
+}
