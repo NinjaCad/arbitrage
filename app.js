@@ -55,9 +55,6 @@ const setBusy = (busy) => {
     refreshButton.disabled = busy;
   }
 
-  if (lockButton) {
-    lockButton.disabled = busy;
-  }
 };
 
 const renderEmpty = (message) => {
@@ -71,29 +68,17 @@ const renderEmpty = (message) => {
 const hasAccess = () => localStorage.getItem(ACCESS_STORAGE_KEY) === 'granted';
 
 const fetchArbitrageHtml = async () => {
-  const endpoints = [
-    ARBITRAGE_URL,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(ARBITRAGE_URL)}`,
-    'https://r.jina.ai/http://www.predictionhunt.com/arbitrage'
-  ];
-
-  for (const endpoint of endpoints) {
-    try {
-      const response = await fetch(endpoint, { cache: 'no-store' });
-      if (!response.ok) {
-        continue;
-      }
-
-      const html = await response.text();
-      if (html && html.length > 1000) {
-        return html;
-      }
-    } catch {
-      // Try the next endpoint.
-    }
+  const response = await fetch(ARBITRAGE_URL, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error('Unable to load arbitrage page data right now.');
   }
 
-  throw new Error('Unable to load arbitrage page data right now.');
+  const html = await response.text();
+  if (!html || html.length < 100) {
+    throw new Error('Unable to load arbitrage page data right now.');
+  }
+
+  return html;
 };
 
 const pickString = (obj, keys) => {
@@ -464,7 +449,7 @@ const unlockDashboard = () => {
 
 const lockDashboard = () => {
   localStorage.removeItem(ACCESS_STORAGE_KEY);
-  window.location.href = 'index.html';
+  window.location.replace('index.html');
 };
 
 const initAccessPage = () => {
